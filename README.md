@@ -2,64 +2,79 @@
 
 **Grupo 23:** Arthur Vidal Regis Gouveia (123110755) e Pedro Henriques Barros Pereira (123110565).
 
-## Objetivo
+## Situação da atividade (26/11/2026)
 
-Implantar as tres APIs FastAPI (CPU-bound, Memory-bound e I/O-bound) num cluster Kubernetes Minikube de um no, em VM Ubuntu no OpenStack LSD, disponibilizadas via balanceador Octavia.
+**Infraestrutura implementada e testada:** VM Ubuntu 24.04 no OpenStack LSD, cluster Minikube de um nó `Ready`, três Deployments e três Services Kubernetes, encaminhamentos HTTP `systemd` e acesso pelo Octavia. Os testes locais funcionais e externos foram bem-sucedidos, inclusive **9/9 requisições públicas `/health`**.
 
-> **Status:** scripts, imagens e manifestos preparados; **VM/cluster ainda nao criados devido a quota de 96/96 vCPUs e 196608/196608 MiB de RAM** na ultima verificacao. Nao confunda testes offline com deploy realizado.
+**Pendente:** teste de recuperação pós-reboot do Minikube e revisão final das evidências do relatório. Não assumir que os Services ou o Minikube voltam automaticamente após reiniciar a VM.
 
-## Infraestrutura prevista
+## Infraestrutura atual
 
-- VM `vm-arthur-pedro-k8s`: Ubuntu Server 24.04, flavor `general.large` (4 vCPU/8 GiB RAM/20 GB disco).
-- Rede OpenStack `provider`; chave publica `arthur-pedro-k8s` cadastrada.
-- Minikube no driver Docker. Acesso por Octavia **sera configurado somente apos testes do backend**.
+- VM `vm-arthur-pedro-k8s`, UUID `2efda93b-1f22-4bfa-bd5a-9b750b5b44b5`.
+- Ubuntu 24.04.3 LTS, flavor `general.large` (4 vCPUs, 8 GiB RAM, 20 GB de disco).
+- Rede `provider`, IP privado `10.5.10.123`, sub-rede `provider-sub`.
+- Acesso SSH público via listener Octavia: `150.165.85.77:22022`, usuário `ubuntu`, keypair `arthur-pedro-k8s`.
+- Docker 29.10.1, kubectl 1.37.3, Minikube 1.39.0; nó Kubernetes v1.37.0 `Ready`.
+- Três serviços de port-forward `systemd`, supervisionando `kubectl port-forward` nas portas privadas 8001, 8002 e 8003.
+- Load Balancer Octavia compartilhado UUID `57c2b14a-b746-4f34-8719-d0627e409609`; objeto global com `operating_status=ERROR`, apesar dos testes públicos bem-sucedidos. Não modificar recursos de outros grupos.
 
-## Manifestos
+## Aplicações
 
-| App | Imagem | Porta HTTP do container | NodePort planejado |
-| --- | --- | ---: | ---: |
-| CPU | `arthuurvidaal/poi-cpu:atividade4` | 8001 | 30081 |
-| Memory | `arthuurvidaal/poi-memory:atividade4` | 8002 | 30082 |
-| I/O | `arthuurvidaal/poi-io:atividade4` | 8003 | 30083 |
+| App | Imagem | Kubernetes Service | NodePort | Endpoint público |
+| --- | --- | --- | ---: | --- |
+| CPU | `arthuurvidaal/poi-cpu:atividade4` | `poi-cpu:8001` | 30081 | http://150.165.85.77:18001/health |
+| Memory | `arthuurvidaal/poi-memory:atividade4` | `poi-memory:8002` | 30082 | http://150.165.85.77:18002/health |
+| I/O | `arthuurvidaal/poi-io:atividade4` | `poi-io:8003` | 30083 | http://150.165.85.77:18003/health |
 
-`kubernetes/namespace.yaml` define `poi-atividade5`; cada app usa Deployment de uma replica e Service NodePort. Deployment foi escolhido por reconciliacao de replicas e atualizacao declarativa. As verificacoes `/health` sao feitas por liveness/readiness probes. A API I/O usa volume `emptyDir`, sem persistencia apos exclusao do Pod.
+O namespace é `poi-atividade5`. Cada Deployment tem uma réplica, probes de saúde e limites de recursos. A API I/O usa armazenamento temporário `emptyDir`. Os NodePorts do nó Docker não são diretamente expostos no IP da VM; o tráfego externo utiliza serviços `systemd` com `kubectl port-forward`.
 
-## Organizacao
+Testes funcionais confirmados localmente **e pelo Octavia**:
+- `/primos?limite=10000`: 1229 números primos;
+- `/memoria?tamanho_mb=10`: `verificacao=2561`;
+- `/arquivo?tamanho_mb=1&operacoes=1`: `bytes_escritos=1048576`, `bytes_lidos=1048576`, `verificacao=ok`.
 
-- `kubernetes/`: 7 manifestos YAML.
-- `scripts/verificar-openstack.sh`: diagnostico OpenStack somente leitura, para rodar **na VDI**.
-- `scripts/validar-manifestos-offline.py`: analise offline de YAML com PyYAML, para rodar **na VDI** ou outro ambiente Python.
-- `scripts/instalar-dependencias.sh`, `scripts/iniciar-minikube.sh`: somente **na nova VM Ubuntu OpenStack**, apos provisionamento.
-- `scripts/validar-cluster.sh`, `scripts/testar-aplicacoes.sh`: somente **com Minikube funcional**.
-- `documentacao/Atividade-5.1-Infraestrutura-Kubernetes.md`: relatorio com resultados observados e pendencias.
-- `documentacao/ROTEIRO-PENDENTE-QUOTA.md`: roteiro passo a passo da criacao da VM ate os testes externos.
+Os membros antigos em `10.5.9.10` dos três pools HTTP estão desabilitados (`admin_state_up=False`); os novos apontam para `10.5.10.123`. Não excluir ou alterar outros membros do balanceador compartilhado.
 
-## Verificacoes offline (na VDI)
+## Estrutura do repositório
 
-```bash
-cd ~/atividade-5-kubernetes-poi
-git pull origin main
-python3 scripts/validar-manifestos-offline.py
-# Com OpenStack RC carregado:
-bash scripts/verificar-openstack.sh
+- `kubernetes/`: sete manifestos YAML.
+- `scripts/instalar-dependencias.sh`: instala Docker Engine, kubectl e Minikube na VM.
+- `scripts/iniciar-minikube.sh`: inicializa o Minikube de um nó, driver Docker.
+- `scripts/validar-cluster.sh`: valida nó, serviços e rollouts.
+- `scripts/testar-aplicacoes.sh`: testa os endpoints por `kubectl port-forward`.
+- `scripts/validar-manifestos-offline.py`: valida sete manifestos sem cluster.
+- `scripts/verificar-openstack.sh`: diagnósticos somente leitura na VDI com RC autenticado.
+- `documentacao/Atividade-5.1-Infraestrutura-Kubernetes.md`: **relatório completo atualizado com evidências observadas**.
+- `documentacao/ROTEIRO-PENDENTE-QUOTA.md`: roteiro histórico usado durante a preparação; a quota já foi ampliada e a VM já foi criada.
+
+## Acesso e manutenção
+
+No PowerShell Windows, conectar à VDI administrativa do VirtualBox:
+
+```powershell
+ssh -p 2223 osboxes@127.0.0.1
 ```
 
-As tres imagens ja foram consultadas com `docker manifest inspect` e retornaram OK. Os sete YAMLs passaram numa verificacao previa com PyYAML 5.4.1. A validacao de schema Kubernetes e o deploy permanecem pendentes.
-
-## Execucao futura, APENAS na nova VM
+Dentro da VDI (`osboxes`), acessar a VM Kubernetes:
 
 ```bash
-git clone https://github.com/ArthurVidalRegisGouveia/atividade-5-kubernetes-poi.git
-cd atividade-5-kubernetes-poi
-bash scripts/instalar-dependencias.sh
-# Reconectar via SSH para ativar grupo docker
-bash scripts/iniciar-minikube.sh
-kubectl apply -f kubernetes/namespace.yaml
-kubectl apply -f kubernetes/
-bash scripts/validar-cluster.sh
-bash scripts/testar-aplicacoes.sh
+ssh -i ~/.ssh/arthur-pedro-k8s -o IdentitiesOnly=yes -p 22022 ubuntu@150.165.85.77
 ```
 
-**Importante:** os NodePorts do Minikube com driver Docker nao sao expostos automaticamente na interface da VM OpenStack; validar o caminho real antes de ajustar pools Octavia. O balanceador e compartilhado com outras equipes e possui estado operacional ERROR na consulta anterior; modificar apenas membros dos nossos pools apos inspecao.
+Dentro da VM Kubernetes, verificar a infraestrutura:
 
-Nunca versionar chaves privadas SSH, arquivos OpenStack RC, tokens ou senhas.
+```bash
+minikube status
+kubectl -n poi-atividade5 get deployments,pods,services
+systemctl is-active poi-cpu-forward.service poi-memory-forward.service poi-io-forward.service
+```
+
+Testar os serviços publicamente a partir da VDI:
+
+```bash
+for porta in 18001 18002 18003; do curl --noproxy '*' -fsS --max-time 15 "http://150.165.85.77:${porta}/health"; echo; done
+```
+
+**Segurança:** nunca versionar chave SSH privada, RC do OpenStack, tokens ou senhas; não abrir desnecessariamente as portas HTTP para `0.0.0.0/0`. O grupo de segurança foi ajustado com origem restrita para a conectividade com o Octavia.
+
+**Persistência:** os serviços `systemd` estão habilitados e ativos, mas a recuperação do próprio Minikube após um reboot não foi validada.
