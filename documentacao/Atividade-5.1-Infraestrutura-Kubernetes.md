@@ -4,81 +4,136 @@
 **Alunos:** Arthur Vidal Regis Gouveia; Pedro Henriques Barros Pereira  
 **Matrículas:** 123110755; 123110565
 
-> **Estado em 26/11/2026: preparação efetuada; provisionamento, cluster e testes externos ainda pendentes.** Nenhum resultado posterior foi inventado.
+> **Estado observado em 26/11/2026:** VM OpenStack criada, Minikube de um nó funcional, três APIs implantadas e testadas localmente e via Octavia. Foram **9/9 respostas positivas** nos testes de estabilidade de `/health` pelo endereço público. Ainda faltam validar a recuperação do Minikube após reiniciar a VM e finalizar evidências visuais, se exigidas.
 
 ## Configuração da VM e ambiente da Cloud
 
-### Acesso administrativo ao OpenStack
+### Ambiente administrativo e autenticação
 
-O acesso foi restabelecido utilizando a VDI Ubuntu 22.04 LTS x86_64 fornecida para as atividades anteriores, executada no Oracle VirtualBox em um computador Windows. Uma regra NAT encaminha a porta local 2223/TCP para a porta SSH 22/TCP da VDI. No PowerShell do Windows, o acesso e realizado por:
+A administração do OpenStack LSD foi realizada a partir de uma VDI Ubuntu em Oracle VirtualBox no Windows. O encaminhamento NAT da VDI permite SSH a partir do PowerShell:
 
 ```powershell
 ssh -p 2223 osboxes@127.0.0.1
 ```
 
-Na VDI, o cliente `openstack 5.8.0` foi autenticado com um arquivo OpenStack RC baixado para o projeto `Provisionamento`. Arquivo RC, senha, token e chave privada **nao sao versionados**.
+Na VDI (`osboxes`), o arquivo `~/provisionamento-openrc.sh` é carregado com `source` para autenticar no projeto `Provisionamento`. Credenciais, tokens, arquivo RC e chave SSH privada não foram versionados.
 
-### Recursos identificados e restricao de quota
+A quota original estava esgotada (96/96 vCPUs e 196608/196608 MiB de RAM). Após intervenção do administrador, passou para **112 vCPUs e 229376 MiB de RAM**, com 96 vCPUs e 196608 MiB utilizados no momento da verificação, permitindo o provisionamento.
 
-- Projeto: `Provisionamento`.
-- Imagem prevista: `ubuntu-24.04` (disponivel e ativa).
-- Flavor previsto: `general.large`, com **4 vCPUs, 8192 MiB de RAM e disco de 20 GB**.
-- Redes disponiveis: `provider` e `public`.
-- Grupo de seguranca existente: `sg-arthur-pedro-poi`.
-- Chave SSH criada na VDI em `~/.ssh/arthur-pedro-k8s` e chave publica importada ao OpenStack com o nome `arthur-pedro-k8s` (ED25519). A chave privada permanece somente na VDI.
-- VM anterior `vm-arthur-pedro-poi`: nao encontrada. Nova VM `vm-arthur-pedro-k8s`: ainda nao criada.
-- Volume antigo `volume-arthur-pedro-poi`: 1 GiB, `available`; nao alterado.
+### VM implantada
 
-Na consulta mais recente informada, a quota compartilhada estava totalmente utilizada: **96/96 vCPUs e 196608/196608 MiB de RAM**. Ha capacidade de contagem de instancias (26/45), mas nao de CPU ou RAM. Assim, ainda nao foi possivel provisionar a VM. Nenhuma VM de outros grupos sera excluida para liberar recursos.
+- **Nome:** `vm-arthur-pedro-k8s`.
+- **UUID:** `2efda93b-1f22-4bfa-bd5a-9b750b5b44b5`.
+- **Imagem:** `ubuntu-24.04`; sistema inicializado como Ubuntu 24.04.3 LTS.
+- **Flavor:** `general.large` — 4 vCPUs, 8192 MiB de RAM e 20 GB de disco nominal.
+- **Rede:** `provider`, sub-rede `provider-sub` (`10.5.8.0/22`); IP privado `10.5.10.123`.
+- **Security group:** `sg-arthur-pedro-poi`.
+- **Keypair:** `arthur-pedro-k8s` (ED25519); chave privada permanece na VDI em `~/.ssh/arthur-pedro-k8s`.
+- **Estado observado:** `ACTIVE`, inicialização concluída pelo `cloud-init`, usuário SSH `ubuntu`.
 
-O roteiro de verificacao de quota e recursos, sem mutacoes, consta em `scripts/verificar-openstack.sh`. A criacao futura da VM e descrita em `documentacao/ROTEIRO-PENDENTE-QUOTA.md`.
+O acesso SSH privado direto da VDI para `10.5.10.123:22` não funcionou. Foi reaproveitado **somente o listener SSH do grupo** no Octavia, pela porta pública `22022`, com novo membro `10.5.10.123:22`. O membro SSH antigo (`10.5.9.10:22`) foi removido depois de confirmar o acesso e a impressão digital ED25519 da nova VM.
 
-### Balanceador de carga existente
+```bash
+# Na VDI, após autenticar no OpenStack:
+ssh -i ~/.ssh/arthur-pedro-k8s -o IdentitiesOnly=yes -p 22022 ubuntu@150.165.85.77
+```
 
-O Octavia foi consultado apos a instalacao do cliente `python3-octaviaclient` na VDI. O Load Balancer `poi-atividades` (ID `57c2b14a-b746-4f34-8719-d0627e409609`) tem VIP privado `10.5.8.242` associado ao IP publico `150.165.85.77`.
+O volume Cinder antigo de 1 GiB não foi conectado à nova VM; não foi necessário para o projeto.
 
-Na consulta observada: `provisioning_status=ACTIVE` e `operating_status=ERROR`. **A causa desse erro nao foi comprovada.** O mesmo balanceador atende diversos grupos; seu objeto global e os listeners dos demais grupos devem permanecer intactos.
+### Balanceador Octavia e segurança
 
-Listeners historicamente atribuidos ao nosso grupo: SSH na porta publica `22022`, CPU na `18001`, Memory na `18002` e I/O na `18003`. Os membros historicos apontavam para a VM antiga `10.5.9.10`; so poderao ser corrigidos depois de testar o novo backend. IDs exatos dos nossos pools e listeners estao documentados no roteiro.
+- **Load Balancer compartilhado:** `poi-atividades`, UUID `57c2b14a-b746-4f34-8719-d0627e409609`.
+- **VIP privado:** `10.5.8.242`; **IP público associado:** `150.165.85.77`.
+- **Portas públicas do grupo:** SSH 22022; CPU 18001; memória 18002; I/O 18003.
+- **Situação observada:** `provisioning_status=ACTIVE`, mas `operating_status=ERROR` no objeto compartilhado. Não foi determinada a causa global, e não foram alterados listeners ou pools de outros grupos.
+
+Para as aplicações HTTP, os backends passaram a ser `10.5.10.123:8001`, `10.5.10.123:8002` e `10.5.10.123:8003`. Os membros antigos em `10.5.9.10` foram **desabilitados** (`admin_state_up=False`) nos três pools, preservando o histórico sem excluí-los. O acesso SSH também permanece funcional.
+
+As portas HTTP na VM são restringidas no Security Group a IPs específicos; foi observada a necessidade de acrescentar permissão restrita à origem `10.5.11.192/32`, além da regra anterior para `10.5.11.10/32`. A origem observada no SSH e o sucesso posterior da CPU são indícios operacionais, mas não constituem, isoladamente, prova de toda a topologia do Octavia. Nenhuma porta HTTP foi aberta indiscriminadamente para `0.0.0.0/0`.
 
 ## Deploy e configuração do cluster Kubernetes
 
-**Planejado, ainda nao realizado.** A VM Ubuntu 24.04 de 4 vCPUs e 8 GiB executara um cluster de no unico com Minikube, driver Docker. No repositorio ha:
+A nova VM recebeu Docker Engine **29.10.1**, kubectl **1.37.3** e Minikube **1.39.0**. A instalação das dependências foi iniciada pelo script `scripts/instalar-dependencias.sh`; como o binário Minikube ainda não estava disponível após a tentativa inicial, foi instalado separadamente a partir do download oficial.
 
-- `scripts/instalar-dependencias.sh`: instala Docker Engine, kubectl e Minikube **na nova VM**;
-- `scripts/iniciar-minikube.sh`: inicia Minikube com 3 vCPUs, 6144 MiB e disco virtual de 12 GiB; essa reserva deve ser confirmada contra o disco disponivel e o comportamento do driver;
-- `scripts/validar-cluster.sh`: confere o status do Minikube, o no e o rollout dos Deployments;
-- `documentacao/ROTEIRO-PENDENTE-QUOTA.md`: sequencia de execucao e verificacao.
+O cluster foi iniciado com `scripts/iniciar-minikube.sh`, usando driver Docker, 3 vCPUs, 6144 MiB de RAM e parâmetro de disco de 12 GiB, runtime containerd. O Kubernetes do nó reportou a versão **v1.37.0**, IP interno `192.168.49.2`, sistema do nó Minikube Debian 12 e runtime `containerd://2.3.4`.
 
-Nao executar esses scripts na VDI Ubuntu administrativa. Nao ha no Kubernetes em funcionamento neste momento. Os detalhes de versao, status e evidencias serao adicionados apos executar e conferir cada comando na nova VM.
+O nó apareceu inicialmente `NotReady` durante a inicialização, mas evoluiu para **`Ready`**. O comando `minikube status` confirmou host, kubelet e apiserver `Running`, além de kubeconfig configurado. O armazenamento raiz da VM apresentava cerca de **12 GB livres** após instalação e criação dos workloads.
+
+O cluster e os Services Kubernetes foram validados com:
+
+```bash
+minikube status
+kubectl get nodes -o wide
+bash scripts/validar-cluster.sh
+```
+
+**Exposição de rede:** como os NodePorts no nó Minikube com driver Docker não são automaticamente publicados no IP da VM OpenStack, foi adotado um encaminhamento na VM por `kubectl port-forward` para cada Service. Os processos estão supervisionados pelos serviços `systemd`:
+
+- `poi-cpu-forward.service`: `10.5.10.123:8001` → `service/poi-cpu:8001`.
+- `poi-memory-forward.service`: `10.5.10.123:8002` → `service/poi-memory:8002`.
+- `poi-io-forward.service`: `10.5.10.123:8003` → `service/poi-io:8003`.
+
+`systemctl is-active` retornou `active` para os três serviços; `curl` no IP privado retornou `{"status":"ok"}` em todas as portas; o `journalctl` confirmou a abertura dos encaminhamentos. Os serviços estão habilitados para inicialização do Ubuntu e possuem política `Restart=always`, mas **a recuperação automática do cluster Minikube após um reboot ainda não foi testada**. Logo, não se afirma persistência integral pós-reinício.
 
 ## Deploy das Aplicações
 
-### Artefatos e justificativa
+### Manifestos e arquitetura
 
-Foram preparados **sete manifestos** no diretorio `kubernetes/`: um Namespace `poi-atividade5`, tres Deployments e tres Services NodePort.
+Foram aplicados sete manifestos Kubernetes: um Namespace `poi-atividade5`, três Deployments (uma réplica por aplicação) e três Services `NodePort`.
 
-| Aplicacao | Imagem Docker | Deployment | NodePort planejado |
+| Aplicação | Imagem | Deployment / Service | Porta do serviço | NodePort |
+| --- | --- | --- | ---: | ---: |
+| CPU-bound | `arthuurvidaal/poi-cpu:atividade4` | `poi-cpu` | 8001 | 30081 |
+| Memory-bound | `arthuurvidaal/poi-memory:atividade4` | `poi-memory` | 8002 | 30082 |
+| I/O-bound | `arthuurvidaal/poi-io:atividade4` | `poi-io` | 8003 | 30083 |
+
+Os Deployments foram escolhidos para reconciliação do número de réplicas e atualizações declarativas. Configuram requests/limits de recursos, `livenessProbe` e `readinessProbe` em `/health`. A aplicação I/O usa `emptyDir` para dados temporários, sem persistência após exclusão do Pod.
+
+Comandos aplicados:
+
+```bash
+kubectl apply -f kubernetes/namespace.yaml
+kubectl apply -f kubernetes/
+kubectl get pods -n poi-atividade5
+bash scripts/validar-cluster.sh
+bash scripts/testar-aplicacoes.sh
+```
+
+Os três Pods chegaram a `1/1 Running` e os três Deployments concluíram `rollout` com sucesso.
+
+### Testes locais dos Services
+
+`scripts/testar-aplicacoes.sh` utilizou `kubectl port-forward` temporário para validar:
+
+| Aplicação | `/health` | Teste funcional | Resultado observado |
 | --- | --- | --- | --- |
-| CPU-bound | `arthuurvidaal/poi-cpu:atividade4` | `poi-cpu` | 30081 |
-| Memory-bound | `arthuurvidaal/poi-memory:atividade4` | `poi-memory` | 30082 |
-| I/O-bound | `arthuurvidaal/poi-io:atividade4` | `poi-io` | 30083 |
+| CPU | `{"status":"ok"}` | `/primos?limite=10000` | `quantidade_primos=1229` |
+| Memory | `{"status":"ok"}` | `/memoria?tamanho_mb=10` | `verificacao=2561` |
+| I/O | `{"status":"ok"}` | `/arquivo?tamanho_mb=1&operacoes=1` | `bytes_escritos=1048576`, `bytes_lidos=1048576`, `verificacao=ok` |
 
-O **Deployment** foi escolhido por permitir manter a replica desejada por ReplicaSet, reiniciar Pods que falham e executar atualizacoes declarativas; nao precisamos de identidade de rede ou armazenamento estavel por Pod, como em um StatefulSet. Cada Deployment configura recursos solicitados/limitados e `livenessProbe` e `readinessProbe` usando `/health`.
+Os sete manifestos também haviam passado pela verificação offline em `scripts/validar-manifestos-offline.py`, que retornou `OK: 7 manifestos e invariantes do projeto verificados offline.`.
 
-A aplicacao I/O utiliza `emptyDir` no caminho `/dados/io-temporarios`, adequado aos arquivos de trabalho descartaveis gerados pelos testes. Os dados nao persistem apos remocao do Pod. O volume Cinder existente nao foi anexado nem e utilizado nesse desenho.
+### Testes externos pelo Octavia
 
-### Verificacoes feitas sem cluster
+A partir da VDI, foram realizadas requisições HTTP ao IP público `150.165.85.77` nas portas do grupo:
 
-1. O Docker Hub respondeu a `docker manifest inspect` para as tres imagens: CPU **OK**, Memory **OK**, I/O **OK**. Isso verifica a disponibilidade dos manifestos das imagens, **nao** a execucao dos containers.
-2. A VDI Ubuntu usou Python 3 e PyYAML 5.4.1 para analisar os sete arquivos `.yaml`. Todos foram interpretados com sucesso e possuem os campos basicos `apiVersion`, `kind` e `metadata.name`.
-3. Foram preparados testes offline adicionais em `scripts/validar-manifestos-offline.py` para conferir nomes, namespace, seletores, imagens, portas, probes e armazenamento temporario. **Esse script foi versionado, mas ainda precisa ser executado e ter sua saida registrada.**
-4. O comando `kubectl create --dry-run=client`, mesmo com `--validate=false`, tentou consultar `localhost:8080`, pois a VDI nao possui acesso a um cluster Kubernetes. Isso **nao demonstra defeito nos YAMLs**.
+| Aplicação | Endpoint `/health` público | Evidência |
+| --- | --- | --- |
+| CPU | `http://150.165.85.77:18001/health` | HTTP 200, `{"status":"ok"}` |
+| Memory | `http://150.165.85.77:18002/health` | `{"status":"ok"}` |
+| I/O | `http://150.165.85.77:18003/health` | HTTP 200, `{"status":"ok"}` |
 
-### Validacoes pendentes
+Os três endpoints funcionais também responderam pelo Octavia, com resultados:
 
-Assim que a VM e o Minikube estiverem prontos, aplicar os manifestos, verificar Pods, Services, eventos e rollouts; executar `scripts/testar-aplicacoes.sh` para requisicoes `/health`, `/primos`, `/memoria` e `/arquivo` por meio de Services e `kubectl port-forward`.
+- CPU `/primos?limite=10000` → `quantidade_primos=1229`;
+- Memory `/memoria?tamanho_mb=10` → `verificacao=2561`;
+- I/O `/arquivo?tamanho_mb=1&operacoes=1` → `bytes_escritos=1048576`, `bytes_lidos=1048576`, `bytes_processados=2097152`, `verificacao=ok`.
 
-**Atencao:** com Minikube no driver Docker, os NodePorts do no containerizado nao sao automaticamente acessiveis pela interface de rede da VM OpenStack. Antes de modificar qualquer membro dos pools compartilhados, sera necessario verificar a conectividade real e estabelecer exposicao confiavel na VM.
+Ao final, foram repetidas **três requisições `/health` em cada uma das três portas públicas: 9 de 9 testes bem-sucedidos**. Foram confirmados `admin_state_up=False` nos membros HTTP antigos de CPU, Memory e I/O.
 
-Por fim, testar publicamente as APIs pelo endereco Octavia e as portas designadas ao nosso grupo, registrar codigos HTTP e evidencias de navegacao. Essas etapas ainda **nao foram realizadas**.
+### Pontos ainda pendentes
+
+1. Validar o comportamento do Minikube e dos serviços HTTP após um reboot controlado da VM, preparando eventual inicialização automática do Minikube; não reiniciar sem planejamento de recuperação.
+2. Registrar capturas de tela/evidências visuais, caso exigidas no formato final de entrega.
+3. Revisar se a configuração `kubectl port-forward` supervisionada por `systemd` atende aos critérios de disponibilidade e operação esperados na atividade; esse método encaminha ao Pod selecionado e pode requerer reconexão quando ele for substituído.
+4. Manter o balanceador compartilhado e os demais grupos intactos; o estado global `operating_status=ERROR` permanece sem diagnóstico conclusivo, apesar dos testes externos positivos.
