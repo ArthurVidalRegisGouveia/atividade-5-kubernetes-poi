@@ -53,7 +53,7 @@ O relatório final de entrega é um documento Word preparado para importação n
 ## Código-fonte das aplicações e configuração de inicialização
 
 - [Código das três APIs](aplicacoes/README.md) — cópias dos arquivos `main.py` publicados originalmente em [atividade-2-poi](https://github.com/ArthurVidalRegisGouveia/atividade-2-poi), com indicação de procedência. A correspondência exata com o conteúdo das imagens Docker Hub não foi auditada.
-- [Documentação dos serviços systemd](systemd/README.md) — descrição da inicialização automática, com **exemplos reconstruídos** em [systemd/exemplos/](systemd/exemplos/). Esses arquivos não foram extraídos da VM real e não devem substituir os serviços ativos sem conferência.
+- [Configurações reais dos serviços systemd](systemd/README.md) — quatro unidades transcritas da saída de `sudo systemctl cat` executada na VM em 26/11/2026; não são mais modelos reconstruídos.
 - [Evidências visuais](evidencias/) — oito capturas validadas, incluindo cluster, Deployments, rollouts, serviços e testes pelo Octavia.
 
-**Para demonstrar as configurações systemd reais ao professor:** na VM Kubernetes, utilize `sudo systemctl cat poi-minikube.service poi-cpu-forward.service poi-memory-forward.service poi-io-forward.service`. Os arquivos originais instalados ainda não foram coletados.
+**Para apresentar o `systemd` ao professor:** abra os quatro arquivos reais em [`systemd/`](systemd/) e, se necessário, execute `sudo systemctl cat` na VM.
