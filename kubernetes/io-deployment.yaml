@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poi-io
+  namespace: poi-atividade5
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poi-io
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: poi-io
+    spec:
+      containers:
+        - name: io
+          image: arthuurvidaal/poi-io:atividade4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8003
+          env:
+            - name: IO_DIRETORIO_TEMP
+              value: "/dados/io-temporarios"
+            - name: IO_FSYNC
+              value: "1"
+            - name: IO_TAMANHO_MAX_MB
+              value: "32"
+            - name: IO_OPERACOES_MAX
+              value: "5"
+            - name: IO_MAX_SIMULTANEAS
+              value: "2"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: dados-temporarios
+              mountPath: /dados/io-temporarios
+      volumes:
+        - name: dados-temporarios
+          emptyDir: {}

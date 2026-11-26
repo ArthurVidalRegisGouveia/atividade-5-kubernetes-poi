@@ -1,0 +1,11 @@
+# Credenciais e configurações locais sensíveis
+.env
+.env.*
+!.env.example
+*openrc*.sh
+*.pem
+*.key
+.kube/
+.minikube/
+__pycache__/
+.DS_Store
