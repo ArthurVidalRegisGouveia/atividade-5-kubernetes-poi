@@ -142,3 +142,39 @@ Ao final, foram repetidas **três requisições `/health` em cada uma das três 
 Foi configurado `poi-minikube.service` (`systemd`) para executar `minikube start` com driver Docker e aguardar `kubectl wait --for=condition=Ready node/minikube`. Os três serviços de port-forward foram associados à dependência de inicialização do Minikube. A validação de sintaxe `systemd-analyze verify` não retornou erro, e os quatro serviços foram confirmados `enabled`.
 
 Após o reboot controlado, a saída de `minikube status` reportou host, kubelet e apiserver como `Running` e kubeconfig `Configured`; `kubectl get nodes -o wide` mostrou `minikube Ready`, Kubernetes v1.37.0. O usuário confirmou que as verificações adicionais do serviço de inicialização, Pods, encaminhamentos e endpoints privados e públicos também passaram. As saídas completas desses testes adicionais não foram transcritas na conversa, de modo que são registradas como confirmação informada pelo operador, e não como logs integrais anexados.
+
+## Evidências visuais de implantação e testes
+
+As oito capturas foram verificadas durante a realização da atividade. Os arquivos PNG devem estar na pasta `evidencias/` na raiz do repositório para que as imagens abaixo sejam exibidas no GitHub. O roteiro de coleta e conferência está em [`EVIDENCIAS-ENTREGA.md`](EVIDENCIAS-ENTREGA.md).
+
+### Evidência 01 — VM Ubuntu ACTIVE no OpenStack, com IP e flavor
+
+![VM Ubuntu ACTIVE no OpenStack, com IP e flavor](../evidencias/01-vm-openstack.png)
+
+### Evidência 02 — Minikube Running e nó Kubernetes Ready
+
+![Minikube Running e nó Kubernetes Ready](../evidencias/02-minikube-ready.png)
+
+### Evidência 03 — Três Deployments, Pods e Services NodePort
+
+![Três Deployments, Pods e Services NodePort](../evidencias/03-deployments-pods-services.png)
+
+### Evidência 04 — Rollout concluído das três aplicações
+
+![Rollout concluído das três aplicações](../evidencias/04-rollouts.png)
+
+### Evidência 05 — Quatro serviços habilitados e ativos após reboot
+
+![Quatro serviços habilitados e ativos após reboot](../evidencias/05-systemd.png)
+
+### Evidência 06 — As três APIs respondendo em /health pelo Octavia
+
+![As três APIs respondendo em /health pelo Octavia](../evidencias/06-health-octavia.png)
+
+### Evidência 07 — Testes funcionais públicos das três APIs
+
+![Testes funcionais públicos das três APIs](../evidencias/07-testes-funcionais.png)
+
+### Evidência 08 — Membros novos e antigos dos três pools HTTP
+
+![Membros novos e antigos dos três pools HTTP](../evidencias/08-octavia.png)
