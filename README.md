@@ -1,6 +1,6 @@
 # Atividade 5.1 — Infraestrutura Kubernetes (POI)
 
-Grupo: Arthur e Pedro. **Preencher matrículas e identificação oficial do grupo.**
+Grupo 23: Arthur Vidal Regis Gouveia (123110755), Pedro Henriques Barros Pereira (123110565). 
 
 ## Objetivo
 
@@ -50,4 +50,4 @@ bash scripts/validar-cluster.sh
 - [ ] Deployments implantados e testados no Kubernetes.
 - [ ] Exposição pela VM e pelo Octavia validada externamente.
 
-Não publicar arquivos OpenStack RC, senhas, tokens, chaves privadas SSH nem `.kube/config` neste repositório.
+
