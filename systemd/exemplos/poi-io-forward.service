@@ -1,0 +1,19 @@
+# EXEMPLO RECONSTRUIDO — NAO E COPIA VERIFICADA DA VM EM PRODUCAO.
+[Unit]
+Description=POI - encaminhamento I/O para Octavia
+Wants=network-online.target
+After=network-online.target poi-minikube.service
+Requires=poi-minikube.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+Environment=HOME=/home/ubuntu
+Environment=KUBECONFIG=/home/ubuntu/.kube/config
+ExecStart=/usr/local/bin/kubectl --namespace=poi-atividade5 port-forward --address=10.5.10.123 service/poi-io 8003:8003
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
