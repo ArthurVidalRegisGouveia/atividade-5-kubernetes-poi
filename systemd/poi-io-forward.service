@@ -1,0 +1,16 @@
+[Unit]
+Description=POI Kubernetes - Port Forward io
+Wants=network-online.target
+After=network-online.target docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+Environment=HOME=/home/ubuntu
+Environment=KUBECONFIG=/home/ubuntu/.kube/config
+ExecStart=/usr/local/bin/kubectl -n poi-atividade5 port-forward --address 10.5.10.123 service/poi-io 8003:8003
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
