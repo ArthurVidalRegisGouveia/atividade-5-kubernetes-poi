@@ -1,53 +1,65 @@
 # Atividade 5.1 — Infraestrutura Kubernetes (POI)
 
-Grupo 23: Arthur Vidal Regis Gouveia (123110755), Pedro Henriques Barros Pereira (123110565). 
+**Grupo 23:** Arthur Vidal Regis Gouveia (123110755) e Pedro Henriques Barros Pereira (123110565).
 
 ## Objetivo
 
-Implantar as três aplicações FastAPI das atividades anteriores em um cluster Kubernetes de nó único usando Minikube na nuvem OpenStack do LSD.
+Implantar as tres APIs FastAPI (CPU-bound, Memory-bound e I/O-bound) num cluster Kubernetes Minikube de um no, em VM Ubuntu no OpenStack LSD, disponibilizadas via balanceador Octavia.
 
-## Requisitos de infraestrutura
+> **Status:** scripts, imagens e manifestos preparados; **VM/cluster ainda nao criados devido a quota de 96/96 vCPUs e 196608/196608 MiB de RAM** na ultima verificacao. Nao confunda testes offline com deploy realizado.
 
-- VM Ubuntu Server 22.04/24.04 LTS, flavor `general.large` (4 vCPUs, 8 GiB RAM).
-- Cluster criado com Minikube; `kubectl` instalado na VM.
-- Exposição externa pelo balanceador Octavia existente, com configuração dos encaminhamentos **a validar após o provisionamento**.
+## Infraestrutura prevista
+
+- VM `vm-arthur-pedro-k8s`: Ubuntu Server 24.04, flavor `general.large` (4 vCPU/8 GiB RAM/20 GB disco).
+- Rede OpenStack `provider`; chave publica `arthur-pedro-k8s` cadastrada.
+- Minikube no driver Docker. Acesso por Octavia **sera configurado somente apos testes do backend**.
 
 ## Manifestos
 
-- `kubernetes/namespace.yaml`: namespace `poi-atividade5`.
-- `kubernetes/*-deployment.yaml`: Deployment com uma réplica, probes HTTP e limites de recursos por API.
-- `kubernetes/*-service.yaml`: Service do tipo NodePort para cada API.
-
-| Aplicação | Imagem | Porta do container | NodePort planejado |
+| App | Imagem | Porta HTTP do container | NodePort planejado |
 | --- | --- | ---: | ---: |
 | CPU | `arthuurvidaal/poi-cpu:atividade4` | 8001 | 30081 |
 | Memory | `arthuurvidaal/poi-memory:atividade4` | 8002 | 30082 |
 | I/O | `arthuurvidaal/poi-io:atividade4` | 8003 | 30083 |
 
-**Atenção:** as portas NodePort só ficam disponíveis na rede do nó Minikube. Com o driver Docker, isso **não garante** acesso pela interface da VM no OpenStack; será necessário testar e configurar uma ponte/encaminhamento adequado antes de alterar os pools do Octavia. Os endereços públicos definitivos ainda não foram validados na Atividade 5.
+`kubernetes/namespace.yaml` define `poi-atividade5`; cada app usa Deployment de uma replica e Service NodePort. Deployment foi escolhido por reconciliacao de replicas e atualizacao declarativa. As verificacoes `/health` sao feitas por liveness/readiness probes. A API I/O usa volume `emptyDir`, sem persistencia apos exclusao do Pod.
 
-## Escolhas de workloads
+## Organizacao
 
-Foram definidos três `Deployment`, pois as APIs FastAPI não exigem identidade persistente de Pod e se beneficiam da reconciliação por ReplicaSet e da atualização declarativa. A configuração inicial usa uma réplica por aplicação para caber em um cluster Minikube de um nó. `readinessProbe` e `livenessProbe` consultam `/health`.
+- `kubernetes/`: 7 manifestos YAML.
+- `scripts/verificar-openstack.sh`: diagnostico OpenStack somente leitura, para rodar **na VDI**.
+- `scripts/validar-manifestos-offline.py`: analise offline de YAML com PyYAML, para rodar **na VDI** ou outro ambiente Python.
+- `scripts/instalar-dependencias.sh`, `scripts/iniciar-minikube.sh`: somente **na nova VM Ubuntu OpenStack**, apos provisionamento.
+- `scripts/validar-cluster.sh`, `scripts/testar-aplicacoes.sh`: somente **com Minikube funcional**.
+- `documentacao/Atividade-5.1-Infraestrutura-Kubernetes.md`: relatorio com resultados observados e pendencias.
+- `documentacao/ROTEIRO-PENDENTE-QUOTA.md`: roteiro passo a passo da criacao da VM ate os testes externos.
 
-O armazenamento de trabalho da API I/O usa `emptyDir`: adequado para arquivos temporários descartáveis, **sem persistência** após a exclusão do Pod. Caso seja exigida persistência, será necessário configurar PV/PVC após validar o ambiente de armazenamento.
-
-## Aplicação dos manifestos — executar apenas após instalar e iniciar Minikube
+## Verificacoes offline (na VDI)
 
 ```bash
-kubectl apply -f kubernetes/namespace.yaml
-kubectl apply -f kubernetes/
-kubectl -n poi-atividade5 get deployments,pods,services -o wide
-bash scripts/validar-cluster.sh
+cd ~/atividade-5-kubernetes-poi
+git pull origin main
+python3 scripts/validar-manifestos-offline.py
+# Com OpenStack RC carregado:
+bash scripts/verificar-openstack.sh
 ```
 
-## Situação atual
+As tres imagens ja foram consultadas com `docker manifest inspect` e retornaram OK. Os sete YAMLs passaram numa verificacao previa com PyYAML 5.4.1. A validacao de schema Kubernetes e o deploy permanecem pendentes.
 
-- [x] Imagens Docker Hub existentes da Atividade 4.
-- [x] Manifestos iniciais preparados para versionamento.
-- [ ] VM `general.large` provisionada (quota do projeto estava esgotada na última consulta).
-- [ ] Minikube instalado e inicializado.
-- [ ] Deployments implantados e testados no Kubernetes.
-- [ ] Exposição pela VM e pelo Octavia validada externamente.
+## Execucao futura, APENAS na nova VM
 
+```bash
+git clone https://github.com/ArthurVidalRegisGouveia/atividade-5-kubernetes-poi.git
+cd atividade-5-kubernetes-poi
+bash scripts/instalar-dependencias.sh
+# Reconectar via SSH para ativar grupo docker
+bash scripts/iniciar-minikube.sh
+kubectl apply -f kubernetes/namespace.yaml
+kubectl apply -f kubernetes/
+bash scripts/validar-cluster.sh
+bash scripts/testar-aplicacoes.sh
+```
 
+**Importante:** os NodePorts do Minikube com driver Docker nao sao expostos automaticamente na interface da VM OpenStack; validar o caminho real antes de ajustar pools Octavia. O balanceador e compartilhado com outras equipes e possui estado operacional ERROR na consulta anterior; modificar apenas membros dos nossos pools apos inspecao.
+
+Nunca versionar chaves privadas SSH, arquivos OpenStack RC, tokens ou senhas.
