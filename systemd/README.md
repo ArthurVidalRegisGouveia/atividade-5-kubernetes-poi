@@ -1,39 +1,48 @@
-# Inicialização automática e port-forward via systemd
+# Configurações reais de inicialização automática via systemd
 
-O ambiente efetivamente testado na VM OpenStack contém quatro serviços habilitados e ativos:
+Em 26/11/2026, o operador executou `sudo systemctl cat` na VM OpenStack `vm-arthur-pedro-k8s` (Ubuntu 24.04.3 LTS, IP privado `10.5.10.123`). Os quatro arquivos abaixo foram **transcritos integralmente do resultado desse comando**, preservando o conteúdo das unidades exibidas:
 
-- `poi-minikube.service`
-- `poi-cpu-forward.service`
-- `poi-memory-forward.service`
-- `poi-io-forward.service`
+| Serviço | Arquivo instalado na VM | Cópia no repositório |
+| --- | --- | --- |
+| Inicialização do cluster | `/etc/systemd/system/poi-minikube.service` | [poi-minikube.service](poi-minikube.service) |
+| Encaminhamento da API CPU | `/etc/systemd/system/poi-cpu-forward.service` | [poi-cpu-forward.service](poi-cpu-forward.service) |
+| Encaminhamento da API Memória | `/etc/systemd/system/poi-memory-forward.service` | [poi-memory-forward.service](poi-memory-forward.service) |
+| Encaminhamento da API I/O | `/etc/systemd/system/poi-io-forward.service` | [poi-io-forward.service](poi-io-forward.service) |
 
-A captura [05-systemd.png](../evidencias/05-systemd.png) comprova a habilitação e atividade após reinicialização da VM. Os encaminhamentos de aplicações utilizam o IP privado `10.5.10.123` e as portas `8001`, `8002` e `8003`.
+## Como funcionam
 
-## Proveniência e limitação importante
+- `poi-minikube.service` inicia o Minikube com driver Docker, 3 vCPUs, 6144 MiB de RAM, disco 12 GiB e runtime containerd; aguarda o nó ficar `Ready`.
+- `poi-cpu-forward.service` publica `service/poi-cpu:8001` no endereço `10.5.10.123:8001`.
+- `poi-memory-forward.service` publica `service/poi-memory:8002` no endereço `10.5.10.123:8002`.
+- `poi-io-forward.service` publica `service/poi-io:8003` no endereço `10.5.10.123:8003`.
+- Os três encaminhamentos reiniciam automaticamente se o processo terminar (`Restart=always`).
 
-Os arquivos em [exemplos/](exemplos/) são **modelos reconstruídos a partir da arquitetura documentada**, e **não** extrações verificadas dos arquivos presentes em `/etc/systemd/system/` na VM. A VM de produção não foi alterada ao publicar este diretório.
+A captura [05-systemd.png](../evidencias/05-systemd.png) registra quatro unidades `enabled` e quatro unidades `active` após reboot controlado.
 
-**Não copie esses modelos por cima das unidades existentes**, pois poderão existir ajustes específicos na VM, como caminhos dos binários, dependências via drop-ins, variáveis ou ordem de inicialização. O ideal para documentar os artefatos exatos é exportar e revisar os arquivos reais da VM.
+## Observação sobre dependências
 
-## Como obter a configuração real para conferência
+**Os arquivos reais exibidos não contêm `Requires=poi-minikube.service` nem `After=poi-minikube.service` nas unidades de port-forward.** Apenas `After=network-online.target docker.service` consta nos serviços de encaminhamento. O resultado de `systemctl cat` fornecido **não mostrou drop-ins**. Não atribuímos aos arquivos uma dependência explícita com o Minikube que não esteja presente na saída.
 
-Dentro da **VM Kubernetes** (prompt `ubuntu@vm-arthur-pedro-k8s`):
+Os serviços foram observados funcionando depois de reiniciar a VM, mas iniciar uma aplicação antes do API Server ficar disponível é um risco mitigado parcialmente por `Restart=always`; não há garantia formal de ordenação entre essas unidades nos arquivos acima.
+
+## Conferência sem alterar o ambiente
+
+Na VM Kubernetes:
 
 ```bash
-for unit in poi-minikube poi-cpu-forward poi-memory-forward poi-io-forward; do
-  echo "=== $unit.service ==="
-  sudo systemctl cat "$unit.service"
-done
-```
+sudo systemctl cat \
+  poi-minikube.service \
+  poi-cpu-forward.service \
+  poi-memory-forward.service \
+  poi-io-forward.service
 
-Esse comando mostra as unidades e os possíveis *drop-ins*. Confira se há credenciais ou segredos antes de publicar qualquer saída.
+systemctl is-enabled \
+  poi-minikube.service poi-cpu-forward.service \
+  poi-memory-forward.service poi-io-forward.service
 
-Para obter apenas os caminhos das unidades principais:
-
-```bash
-systemctl show -p FragmentPath -p DropInPaths \
+systemctl is-active \
   poi-minikube.service poi-cpu-forward.service \
   poi-memory-forward.service poi-io-forward.service
 ```
 
-Os modelos em `exemplos/` foram escritos para ilustrar a lógica, **não como instalação automatizada validada**.
+Estes arquivos servem para **documentação e reprodução controlada**. Sua inclusão no GitHub não altera as unidades em execução na VM. Os modelos hipotéticos anteriormente colocados em `systemd/exemplos/` foram removidos para evitar confusão com os arquivos reais.
