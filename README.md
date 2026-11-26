@@ -46,6 +46,7 @@ Os membros antigos em `10.5.9.10` dos três pools HTTP estão desabilitados (`ad
 - `scripts/verificar-openstack.sh`: diagnósticos somente leitura na VDI com RC autenticado.
 - `documentacao/Atividade-5.1-Infraestrutura-Kubernetes.md`: **relatório completo atualizado com evidências observadas**.
 - `documentacao/ROTEIRO-PENDENTE-QUOTA.md`: roteiro histórico usado durante a preparação; a quota já foi ampliada e a VM já foi criada.
+- `documentacao/EVIDENCIAS-ENTREGA.md`: roteiro de capturas, comandos de validação e checklist da entrega, sem assinaturas.
 
 ## Acesso e manutenção
 
