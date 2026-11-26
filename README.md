@@ -6,7 +6,7 @@
 
 **Infraestrutura implementada e testada:** VM Ubuntu 24.04 no OpenStack LSD, cluster Minikube de um nó `Ready`, três Deployments e três Services Kubernetes, encaminhamentos HTTP `systemd` e acesso pelo Octavia. Os testes locais funcionais e externos foram bem-sucedidos, inclusive **9/9 requisições públicas `/health`**.
 
-**Pendente:** teste de recuperação pós-reboot do Minikube e revisão final das evidências do relatório. Não assumir que os Services ou o Minikube voltam automaticamente após reiniciar a VM.
+**Recuperação pós-reboot validada:** após configurar `poi-minikube.service` e dependências dos encaminhamentos `systemd`, a VM foi reiniciada; o nó Minikube voltou `Ready`, e o usuário confirmou sucesso nos testes dos serviços e endpoints privados e públicos. Restam revisão final e eventuais capturas de tela para entrega.
 
 ## Infraestrutura atual
 
@@ -77,4 +77,4 @@ for porta in 18001 18002 18003; do curl --noproxy '*' -fsS --max-time 15 "http:/
 
 **Segurança:** nunca versionar chave SSH privada, RC do OpenStack, tokens ou senhas; não abrir desnecessariamente as portas HTTP para `0.0.0.0/0`. O grupo de segurança foi ajustado com origem restrita para a conectividade com o Octavia.
 
-**Persistência:** os serviços `systemd` estão habilitados e ativos, mas a recuperação do próprio Minikube após um reboot não foi validada.
+**Persistência:** `poi-minikube.service` foi habilitado para inicializar o cluster após Docker; os três serviços HTTP estão habilitados e dependem da inicialização do Minikube. O teste pós-reboot foi confirmado como bem-sucedido pelo operador.
