@@ -48,3 +48,12 @@ Em 26/11/2026, os três Pods estavam `Running`, os Deployments concluíram o rol
 O relatório final de entrega é um documento Word preparado para importação no Google Docs.
 
 **Nota:** o Octavia é compartilhado e apresentou estado global `operating_status=ERROR`, apesar do sucesso nos endpoints deste grupo. Não alterar recursos de outros grupos ou publicar credenciais.
+
+
+## Código-fonte das aplicações e configuração de inicialização
+
+- [Código das três APIs](aplicacoes/README.md) — cópias dos arquivos `main.py` publicados originalmente em [atividade-2-poi](https://github.com/ArthurVidalRegisGouveia/atividade-2-poi), com indicação de procedência. A correspondência exata com o conteúdo das imagens Docker Hub não foi auditada.
+- [Documentação dos serviços systemd](systemd/README.md) — descrição da inicialização automática, com **exemplos reconstruídos** em [systemd/exemplos/](systemd/exemplos/). Esses arquivos não foram extraídos da VM real e não devem substituir os serviços ativos sem conferência.
+- [Evidências visuais](evidencias/) — oito capturas validadas, incluindo cluster, Deployments, rollouts, serviços e testes pelo Octavia.
+
+**Para demonstrar as configurações systemd reais ao professor:** na VM Kubernetes, utilize `sudo systemctl cat poi-minikube.service poi-cpu-forward.service poi-memory-forward.service poi-io-forward.service`. Os arquivos originais instalados ainda não foram coletados.
