@@ -4,7 +4,7 @@
 **Alunos:** Arthur Vidal Regis Gouveia; Pedro Henriques Barros Pereira  
 **Matrículas:** 123110755; 123110565
 
-> **Estado observado em 26/11/2026:** VM OpenStack criada, Minikube de um nó funcional, três APIs implantadas e testadas localmente e via Octavia. Foram **9/9 respostas positivas** nos testes de estabilidade de `/health` pelo endereço público. Ainda faltam validar a recuperação do Minikube após reiniciar a VM e finalizar evidências visuais, se exigidas.
+> **Estado observado em 26/11/2026:** VM OpenStack criada, Minikube de um nó funcional, três APIs implantadas e testadas localmente e via Octavia. Foram **9/9 respostas positivas** nos testes de estabilidade de `/health` pelo endereço público. O usuário confirmou que o teste de recuperação após reinicializar a VM foi bem-sucedido, incluindo as verificações de serviços e aplicações. Permanecem eventuais evidências visuais, se exigidas.
 
 ## Configuração da VM e ambiente da Cloud
 
@@ -73,7 +73,7 @@ bash scripts/validar-cluster.sh
 - `poi-memory-forward.service`: `10.5.10.123:8002` → `service/poi-memory:8002`.
 - `poi-io-forward.service`: `10.5.10.123:8003` → `service/poi-io:8003`.
 
-`systemctl is-active` retornou `active` para os três serviços; `curl` no IP privado retornou `{"status":"ok"}` em todas as portas; o `journalctl` confirmou a abertura dos encaminhamentos. Os serviços estão habilitados para inicialização do Ubuntu e possuem política `Restart=always`, mas **a recuperação automática do cluster Minikube após um reboot ainda não foi testada**. Logo, não se afirma persistência integral pós-reinício.
+`systemctl is-active` retornou `active` para os três serviços; `curl` no IP privado retornou `{"status":"ok"}` em todas as portas; o `journalctl` confirmou a abertura dos encaminhamentos. Os serviços estão habilitados para inicialização do Ubuntu e possuem política `Restart=always`, e foi configurado o serviço `poi-minikube.service` para iniciar o cluster após o Docker, aguardar o nó ficar `Ready` e permitir a inicialização ordenada dos encaminhamentos HTTP. **Após reiniciar a VM, o usuário confirmou que as verificações de recuperação foram bem-sucedidas.**
 
 ## Deploy das Aplicações
 
@@ -133,7 +133,12 @@ Ao final, foram repetidas **três requisições `/health` em cada uma das três 
 
 ### Pontos ainda pendentes
 
-1. Validar o comportamento do Minikube e dos serviços HTTP após um reboot controlado da VM, preparando eventual inicialização automática do Minikube; não reiniciar sem planejamento de recuperação.
-2. Registrar capturas de tela/evidências visuais, caso exigidas no formato final de entrega.
-3. Revisar se a configuração `kubectl port-forward` supervisionada por `systemd` atende aos critérios de disponibilidade e operação esperados na atividade; esse método encaminha ao Pod selecionado e pode requerer reconexão quando ele for substituído.
-4. Manter o balanceador compartilhado e os demais grupos intactos; o estado global `operating_status=ERROR` permanece sem diagnóstico conclusivo, apesar dos testes externos positivos.
+1. Registrar capturas de tela/evidências visuais, caso exigidas no formato final de entrega.
+2. Revisar se a configuração `kubectl port-forward` supervisionada por `systemd` atende aos critérios de disponibilidade e operação esperados na atividade; esse método encaminha ao Pod selecionado e pode requerer reconexão quando ele for substituído.
+3. Manter o balanceador compartilhado e os demais grupos intactos; o estado global `operating_status=ERROR` permanece sem diagnóstico conclusivo, apesar dos testes externos positivos.
+
+### Verificação após reinicialização da VM
+
+Foi configurado `poi-minikube.service` (`systemd`) para executar `minikube start` com driver Docker e aguardar `kubectl wait --for=condition=Ready node/minikube`. Os três serviços de port-forward foram associados à dependência de inicialização do Minikube. A validação de sintaxe `systemd-analyze verify` não retornou erro, e os quatro serviços foram confirmados `enabled`.
+
+Após o reboot controlado, a saída de `minikube status` reportou host, kubelet e apiserver como `Running` e kubeconfig `Configured`; `kubectl get nodes -o wide` mostrou `minikube Ready`, Kubernetes v1.37.0. O usuário confirmou que as verificações adicionais do serviço de inicialização, Pods, encaminhamentos e endpoints privados e públicos também passaram. As saídas completas desses testes adicionais não foram transcritas na conversa, de modo que são registradas como confirmação informada pelo operador, e não como logs integrais anexados.
