@@ -81,6 +81,19 @@ openstack loadbalancer member list 2a9f5bf7-a0cd-4203-b58a-d98a90c35024
 openstack loadbalancer member list c35b149a-3002-4136-aeaf-30696da03f71
 ```
 
+### Inventario confirmado dos membros antigos em 26/11/2026
+
+Os quatro comandos `openstack loadbalancer member list <POOL_ID>` retornaram **um membro por pool**, todos com `provisioning_status=ACTIVE`, `operating_status=NO_MONITOR`, peso 1 e o endereco privado antigo `10.5.9.10`:
+
+| Servico | Pool ID | Member ID | Endereco antigo |
+| --- | --- | --- | --- |
+| SSH | `f066db26-7733-418c-be4d-397a36eaeb74` | `0f1ff044-b6fc-435a-a442-a4ae690b81b1` | `10.5.9.10:22` |
+| CPU | `48c674d4-dc2c-4589-8ea1-7faef39f3da4` | `5c2b679f-9c06-4bf4-98de-59ce7fb6aca8` | `10.5.9.10:8001` |
+| Memory | `2a9f5bf7-a0cd-4203-b58a-d98a90c35024` | `a3606ba9-924f-40b5-ae09-79ff445402fd` | `10.5.9.10:8002` |
+| I/O | `c35b149a-3002-4136-aeaf-30696da03f71` | `ba5cb6fd-4195-46f6-86fa-5856bde6ef8f` | `10.5.9.10:8003` |
+
+`NO_MONITOR` nao comprova que o backend esta saudavel. Estes membros ainda nao foram alterados. O futuro encaminhamento do Octavia pode utilizar portas de proxy na VM (por exemplo, 8001/8002/8003) somente se sua conectividade para os Services Kubernetes for realmente implementada e testada. Nao assumir que NodePorts 30081/30082/30083 funcionam no IP da VM quando Minikube utiliza driver Docker.
+
 Os ajustes de membros (novo IP privado e portas comprovadamente acessiveis) so devem ocorrer depois de registrar os membros antigos e confirmar que esses pools sao exclusivamente nossos. Nao existe ainda comando seguro de alteracao predefinido porque o IP, a topologia e a exposicao da nova VM nao foram testados.
 
 ## 5. Evidencias para a demonstracao
