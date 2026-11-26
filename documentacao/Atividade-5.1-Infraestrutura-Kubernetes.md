@@ -60,3 +60,12 @@ bash scripts/testar-aplicacoes.sh
 - Pós-reboot: Minikube `Ready` e quatro serviços `systemd` habilitados e ativos.
 
 As oito capturas de evidência foram incorporadas no relatório Word/Google Docs, sem depender de imagens hospedadas no GitHub.
+
+
+## Código-fonte e artefatos complementares
+
+Os códigos-fonte disponíveis para apresentação encontram-se em [`aplicacoes/`](../aplicacoes/), copiados dos arquivos Python publicados no repositório da [Atividade 2](https://github.com/ArthurVidalRegisGouveia/atividade-2-poi). A correspondência exata desse conteúdo com as imagens Docker `atividade4` atualmente usadas nos Deployments não foi verificada por inspeção das imagens.
+
+A configuração de inicialização automática foi documentada em [`systemd/README.md`](../systemd/README.md), com [modelos de unidades](../systemd/exemplos/) reconstruídos a partir da arquitetura observada. **Os exemplos não são cópias dos arquivos instalados na VM**; as configurações reais e eventuais drop-ins devem ser extraídas por `sudo systemctl cat` para documentação definitiva.
+
+As [oito capturas de evidências](../evidencias/) estão publicadas no GitHub e documentam VM, Minikube, workloads, rollouts, inicialização, testes e membros do balanceador.
