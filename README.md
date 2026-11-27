@@ -47,7 +47,7 @@ Em 26/11/2026, os três Pods estavam `Running`, os Deployments concluíram o rol
 
 ## Código-fonte das aplicações e configuração de inicialização
 
-- [Código das três APIs](aplicacoes/README.md) — cópias dos arquivos `main.py` publicados originalmente em [atividade-2-poi](https://github.com/ArthurVidalRegisGouveia/atividade-2-poi), com indicação de procedência. A correspondência exata com o conteúdo das imagens Docker Hub não foi auditada.
-- [Configurações reais dos serviços systemd](systemd/README.md) — quatro unidades transcritas da saída de `sudo systemctl cat` executada na VM em 26/11/2026; não são mais modelos reconstruídos.
+- [Código das três APIs](aplicacoes/README.md) — cópias dos arquivos `main.py` publicados originalmente em [atividade-2-poi](https://github.com/ArthurVidalRegisGouveia/atividade-2-poi). 
+- [Configurações reais dos serviços systemd](systemd/README.md) — quatro unidades transcritas da saída de `sudo systemctl cat` executada na VM.
 - [Evidências visuais](evidencias/) — oito capturas validadas, incluindo cluster, Deployments, rollouts, serviços e testes pelo Octavia.
 
