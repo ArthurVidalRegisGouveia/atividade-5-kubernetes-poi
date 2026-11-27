@@ -2,9 +2,8 @@
 
 **Grupo:** 23  
 **Alunos:** Arthur Vidal Regis Gouveia (123110755) e Pedro Henriques Barros Pereira (123110565)  
-**Data da validação:** 26/11/2026
 
-Resumo técnico da implantação. O relatório formal, com capturas de tela, é entregue separadamente em Google Docs.
+
 
 ## Configuração da VM e ambiente da Cloud
 
@@ -59,13 +58,12 @@ bash scripts/testar-aplicacoes.sh
 - Octavia: **9/9 testes públicos `/health` bem-sucedidos**.
 - Pós-reboot: Minikube `Ready` e quatro serviços `systemd` habilitados e ativos.
 
-As oito capturas de evidência foram incorporadas no relatório Word/Google Docs, sem depender de imagens hospedadas no GitHub.
 
 
 ## Código-fonte e artefatos complementares
 
-Os códigos-fonte disponíveis para apresentação encontram-se em [`aplicacoes/`](../aplicacoes/), copiados dos arquivos Python publicados no repositório da [Atividade 2](https://github.com/ArthurVidalRegisGouveia/atividade-2-poi). A correspondência exata desse conteúdo com as imagens Docker `atividade4` atualmente usadas nos Deployments não foi verificada por inspeção das imagens.
+Os códigos-fonte disponíveis para apresentação encontram-se em [`aplicacoes/`](../aplicacoes/), 
 
-As **quatro unidades `systemd` reais** da VM foram obtidas pelo operador com `sudo systemctl cat` em 26/11/2026 e transcritas no repositório: [`poi-minikube.service`](../systemd/poi-minikube.service), [`poi-cpu-forward.service`](../systemd/poi-cpu-forward.service), [`poi-memory-forward.service`](../systemd/poi-memory-forward.service) e [`poi-io-forward.service`](../systemd/poi-io-forward.service). A explicação dos arquivos está em [`systemd/README.md`](../systemd/README.md). A saída exibida não mostrou drop-ins. Nas unidades reais dos forwards não há dependência explícita de `poi-minikube.service`; os forwards utilizam `Restart=always`.
+As **quatro unidades `systemd` reais** da VM foram obtidas pelo operador com `sudo systemctl cat`: [`poi-minikube.service`](../systemd/poi-minikube.service), [`poi-cpu-forward.service`](../systemd/poi-cpu-forward.service), [`poi-memory-forward.service`](../systemd/poi-memory-forward.service) e [`poi-io-forward.service`](../systemd/poi-io-forward.service). A explicação dos arquivos está em [`systemd/README.md`](../systemd/README.md). A saída exibida não mostrou drop-ins. Nas unidades reais dos forwards não há dependência explícita de `poi-minikube.service`; os forwards utilizam `Restart=always`.
 
 As [oito capturas de evidências](../evidencias/) estão publicadas no GitHub e documentam VM, Minikube, workloads, rollouts, inicialização, testes e membros do balanceador.
