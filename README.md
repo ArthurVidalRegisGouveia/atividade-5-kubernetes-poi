@@ -45,15 +45,9 @@ Em 26/11/2026, os três Pods estavam `Running`, os Deployments concluíram o rol
 - [`scripts/`](scripts/) — instalação e validação.
 - [`documentacao/Atividade-5.1-Infraestrutura-Kubernetes.md`](documentacao/Atividade-5.1-Infraestrutura-Kubernetes.md) — resumo técnico.
 
-O relatório final de entrega é um documento Word preparado para importação no Google Docs.
-
-**Nota:** o Octavia é compartilhado e apresentou estado global `operating_status=ERROR`, apesar do sucesso nos endpoints deste grupo. Não alterar recursos de outros grupos ou publicar credenciais.
-
-
 ## Código-fonte das aplicações e configuração de inicialização
 
 - [Código das três APIs](aplicacoes/README.md) — cópias dos arquivos `main.py` publicados originalmente em [atividade-2-poi](https://github.com/ArthurVidalRegisGouveia/atividade-2-poi), com indicação de procedência. A correspondência exata com o conteúdo das imagens Docker Hub não foi auditada.
 - [Configurações reais dos serviços systemd](systemd/README.md) — quatro unidades transcritas da saída de `sudo systemctl cat` executada na VM em 26/11/2026; não são mais modelos reconstruídos.
 - [Evidências visuais](evidencias/) — oito capturas validadas, incluindo cluster, Deployments, rollouts, serviços e testes pelo Octavia.
 
-**Para apresentar o `systemd` ao professor:** abra os quatro arquivos reais em [`systemd/`](systemd/) e, se necessário, execute `sudo systemctl cat` na VM.
