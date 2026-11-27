@@ -1,7 +1,5 @@
 # Configurações reais de inicialização automática via systemd
 
-Em 26/11/2026, o operador executou `sudo systemctl cat` na VM OpenStack `vm-arthur-pedro-k8s` (Ubuntu 24.04.3 LTS, IP privado `10.5.10.123`). Os quatro arquivos abaixo foram **transcritos integralmente do resultado desse comando**, preservando o conteúdo das unidades exibidas:
-
 | Serviço | Arquivo instalado na VM | Cópia no repositório |
 | --- | --- | --- |
 | Inicialização do cluster | `/etc/systemd/system/poi-minikube.service` | [poi-minikube.service](poi-minikube.service) |
@@ -20,8 +18,6 @@ Em 26/11/2026, o operador executou `sudo systemctl cat` na VM OpenStack `vm-arth
 A captura [05-systemd.png](../evidencias/05-systemd.png) registra quatro unidades `enabled` e quatro unidades `active` após reboot controlado.
 
 ## Observação sobre dependências
-
-**Os arquivos reais exibidos não contêm `Requires=poi-minikube.service` nem `After=poi-minikube.service` nas unidades de port-forward.** Apenas `After=network-online.target docker.service` consta nos serviços de encaminhamento. O resultado de `systemctl cat` fornecido **não mostrou drop-ins**. Não atribuímos aos arquivos uma dependência explícita com o Minikube que não esteja presente na saída.
 
 Os serviços foram observados funcionando depois de reiniciar a VM, mas iniciar uma aplicação antes do API Server ficar disponível é um risco mitigado parcialmente por `Restart=always`; não há garantia formal de ordenação entre essas unidades nos arquivos acima.
 
