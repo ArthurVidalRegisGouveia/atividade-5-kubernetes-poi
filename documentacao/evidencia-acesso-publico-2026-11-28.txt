@@ -1,0 +1,42 @@
+EVIDENCIA DE ACESSO PUBLICO - ATIVIDADE 5
+Data UTC:
+Sat Nov 28 12:00:28 UTC 2026
+
+CPU - porta 18001
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    15  100    15    0     0    257      0 --:--:-- --:--:-- --:--:--   258
+HTTP/1.1 200 OK
+date: Sat, 28 Nov 2026 12:00:28 GMT
+server: uvicorn
+content-length: 15
+content-type: application/json
+
+{"status":"ok"}
+MEMORY - porta 18002
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    15  100    15    0     0    274      0 --:--:-- --:--:-- --:--:--   277
+HTTP/1.1 200 OK
+date: Sat, 28 Nov 2026 12:00:28 GMT
+server: uvicorn
+content-length: 15
+content-type: application/json
+
+{"status":"ok"}
+IO - porta 18003
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    15  100    15    0     0    275      0 --:--:-- --:--:-- --:--:--   277
+HTTP/1.1 200 OK
+date: Sat, 28 Nov 2026 12:00:27 GMT
+server: uvicorn
+content-length: 15
+content-type: application/json
+
+{"status":"ok"}
+STATUS DOS SERVICOS
+active
+active
+active
+active
