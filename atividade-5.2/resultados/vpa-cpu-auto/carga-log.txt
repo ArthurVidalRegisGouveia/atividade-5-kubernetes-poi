@@ -1,0 +1,5 @@
+Iniciando carga CPU VPA Auto
+Cliente 1: sucesso=203 falha=0
+Cliente 3: sucesso=205 falha=0
+Cliente 2: sucesso=187 falha=0
+Teste finalizado

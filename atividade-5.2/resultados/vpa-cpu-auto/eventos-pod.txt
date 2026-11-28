@@ -1,0 +1,6 @@
+LAST SEEN   TYPE     REASON                OBJECT                        MESSAGE
+65s         Normal   ResizeStarted         pod/poi-cpu-66db8645d-plkbm   Pod resize started: {"containers":[{"name":"cpu","resources":{"limits":{"cpu":"758m","memory":"500Mi"},"requests":{"cpu":"379m","memory":"250Mi"}}}],"generation":2}
+5s          Normal   InPlaceResizedByVPA   pod/poi-cpu-66db8645d-plkbm   Pod was resized in place by VPA Updater.
+64s         Normal   ResizeCompleted       pod/poi-cpu-66db8645d-plkbm   Pod resize completed: {"containers":[{"name":"cpu","resources":{"limits":{"cpu":"758m","memory":"500Mi"},"requests":{"cpu":"379m","memory":"250Mi"}}}],"generation":2}
+5s          Normal   ResizeStarted         pod/poi-cpu-66db8645d-plkbm   Pod resize started: {"containers":[{"name":"cpu","resources":{"limits":{"cpu":"592m","memory":"500Mi"},"requests":{"cpu":"296m","memory":"250Mi"}}}],"generation":3}
+4s          Normal   ResizeCompleted       pod/poi-cpu-66db8645d-plkbm   Pod resize completed: {"containers":[{"name":"cpu","resources":{"limits":{"cpu":"592m","memory":"500Mi"},"requests":{"cpu":"296m","memory":"250Mi"}}}],"generation":3}

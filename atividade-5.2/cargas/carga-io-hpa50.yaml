@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: carga-io-hpa50
+  namespace: poi-atividade5
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 160
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gerador
+          image: curlimages/curl:8.12.1
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Iniciando carga I/O HPA 50%"
+              for cliente in 1 2 3; do
+                (
+                  fim=$(($(date +%s) + 120))
+                  sucesso=0
+                  erro503=0
+                  outros_http=0
+                  erro_conexao=0
+                  while [ "$(date +%s)" -lt "$fim" ]; do
+                    codigo=$(curl -sS --max-time 15 -o /dev/null \
+                      -w '%{http_code}' \
+                      'http://poi-io:8003/arquivo?tamanho_mb=4&operacoes=3')
+                    resultado=$?
+
+                    if [ "$resultado" -ne 0 ]; then
+                      erro_conexao=$((erro_conexao + 1))
+                    elif [ "$codigo" = "200" ]; then
+                      sucesso=$((sucesso + 1))
+                    elif [ "$codigo" = "503" ]; then
+                      erro503=$((erro503 + 1))
+                    else
+                      outros_http=$((outros_http + 1))
+                    fi
+                  done
+                  echo "Cliente $cliente: sucesso=$sucesso http503=$erro503 outros_http=$outros_http erro_conexao=$erro_conexao"
+                ) &
+              done
+              wait
+              echo "Teste finalizado"

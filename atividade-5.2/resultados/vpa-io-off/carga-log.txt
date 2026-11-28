@@ -1,0 +1,5 @@
+Iniciando carga IO VPA Off
+Cliente 2: sucesso=357 erro503=83 outras_falhas=0
+Cliente 3: sucesso=360 erro503=76 outras_falhas=0
+Cliente 1: sucesso=351 erro503=96 outras_falhas=0
+Teste finalizado

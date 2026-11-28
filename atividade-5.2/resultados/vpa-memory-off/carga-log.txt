@@ -1,0 +1,4 @@
+Iniciando carga Memory VPA Off
+Cliente 2: sucesso=106 falha=0
+Cliente 1: sucesso=106 falha=0
+Teste finalizado

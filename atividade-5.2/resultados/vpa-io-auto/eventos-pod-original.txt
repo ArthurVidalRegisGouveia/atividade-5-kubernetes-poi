@@ -1,0 +1,75 @@
+Name:             poi-io-6b4d9d9696-cxmj4
+Namespace:        poi-atividade5
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Thu, 26 Nov 2026 12:40:48 +0000
+Labels:           app=poi-io
+                  pod-template-hash=6b4d9d9696
+Annotations:      vpaInPlaceUpdated: true
+Status:           Running
+IP:               10.244.0.3
+IPs:
+  IP:           10.244.0.3
+Controlled By:  ReplicaSet/poi-io-6b4d9d9696
+Containers:
+  io:
+    Container ID:   containerd://0d77d3476181f9e4fe341bb02834e4e041767e7727ed7664badf6f426243f38a
+    Image:          arthuurvidaal/poi-io:atividade4
+    Image ID:       docker.io/arthuurvidaal/poi-io@sha256:071c45e4e1812c9824245eccab5c63b9850b57009dc8bb74c0b0edbbf975e8c0
+    Port:           8003/TCP (http)
+    Host Port:      0/TCP (http)
+    State:          Running
+      Started:      Thu, 26 Nov 2026 13:40:35 +0000
+    Last State:     Terminated
+      Reason:       Unknown
+      Exit Code:    255
+      Started:      Thu, 26 Nov 2026 12:40:59 +0000
+      Finished:     Thu, 26 Nov 2026 13:40:25 +0000
+    Ready:          True
+    Restart Count:  1
+    Limits:
+      cpu:     1260m
+      memory:  1000Mi
+    Requests:
+      cpu:      126m
+      memory:   250Mi
+    Liveness:   http-get http://:http/health delay=15s timeout=1s period=20s successThreshold=1 failureThreshold=3
+    Readiness:  http-get http://:http/health delay=5s timeout=1s period=10s successThreshold=1 failureThreshold=3
+    Environment:
+      IO_DIRETORIO_TEMP:   /dados/io-temporarios
+      IO_FSYNC:            1
+      IO_TAMANHO_MAX_MB:   32
+      IO_OPERACOES_MAX:    5
+      IO_MAX_SIMULTANEAS:  2
+    Mounts:
+      /dados/io-temporarios from dados-temporarios (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-h5gzd (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       True
+  ContainersReady             True
+  PodScheduled                True
+Volumes:
+  dados-temporarios:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+  kube-api-access-h5gzd:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason               Age   From         Message
+  ----    ------               ----  ----         -------
+  Normal  ResizeStarted        25s   kubelet      Pod resize started: {"containers":[{"name":"io","resources":{"limits":{"cpu":"1260m","memory":"1000Mi"},"requests":{"cpu":"126m","memory":"250Mi"}}}],"generation":2}
+  Normal  InPlaceResizedByVPA  24s   vpa-updater  Pod was resized in place by VPA Updater.
+  Normal  ResizeCompleted      24s   kubelet      Pod resize completed: {"containers":[{"name":"io","resources":{"limits":{"cpu":"1260m","memory":"1000Mi"},"requests":{"cpu":"126m","memory":"250Mi"}}}],"generation":2}

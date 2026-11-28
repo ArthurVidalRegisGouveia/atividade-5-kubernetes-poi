@@ -1,0 +1,5 @@
+Iniciando carga CPU: 3 clientes, 120 segundos
+Cliente 1: sucesso=242 falha=0
+Cliente 2: sucesso=247 falha=0
+Cliente 3: sucesso=237 falha=0
+Teste finalizado

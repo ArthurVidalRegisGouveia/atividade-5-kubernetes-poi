@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: carga-cpu-vpa-auto
+  namespace: poi-atividade5
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 160
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gerador
+          image: curlimages/curl:8.12.1
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Iniciando carga CPU VPA Auto"
+              for cliente in 1 2 3; do
+                (
+                  fim=$(($(date +%s) + 120))
+                  sucesso=0
+                  falha=0
+                  while [ "$(date +%s)" -lt "$fim" ]; do
+                    codigo=$(curl -sS --max-time 15 -o /dev/null \
+                      -w '%{http_code}' \
+                      'http://poi-cpu:8001/primos?limite=100000')
+                    resultado=$?
+
+                    if [ "$resultado" -eq 0 ] && [ "$codigo" = "200" ]; then
+                      sucesso=$((sucesso + 1))
+                    else
+                      falha=$((falha + 1))
+                    fi
+                  done
+                  echo "Cliente $cliente: sucesso=$sucesso falha=$falha"
+                ) &
+              done
+              wait
+              echo "Teste finalizado"

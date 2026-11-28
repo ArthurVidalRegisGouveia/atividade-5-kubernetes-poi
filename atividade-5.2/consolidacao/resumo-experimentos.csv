@@ -1,0 +1,13 @@
+aplicacao,tipo,politica,replicas_teste,duracao_segundos,sucessos,http503,outras_falhas,vazao_sucessos_req_s
+cpu,hpa,50,2,120,769,0,0,6.4083
+cpu,hpa,75,2,120,726,0,0,6.0500
+memory,hpa,50,2,120,216,0,0,1.8000
+memory,hpa,75,1,120,216,0,0,1.8000
+io,hpa,50,2,120,1143,209,0,9.5250
+io,hpa,75,2,120,1174,190,0,9.7833
+cpu,vpa,Off,1,120,602,0,0,5.0167
+cpu,vpa,InPlaceOrRecreate,2,120,595,0,0,4.9583
+memory,vpa,Off,1,120,212,0,0,1.7667
+memory,vpa,InPlaceOrRecreate,2,120,214,0,0,1.7833
+io,vpa,Off,1,120,1068,255,0,8.9000
+io,vpa,InPlaceOrRecreate,2,120,1273,79,0,10.6083

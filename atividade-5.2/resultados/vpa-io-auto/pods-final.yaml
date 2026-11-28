@@ -1,0 +1,413 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      vpaInPlaceUpdated: "true"
+    creationTimestamp: "2026-11-26T12:40:47Z"
+    generateName: poi-io-6b4d9d9696-
+    generation: 8
+    labels:
+      app: poi-io
+      pod-template-hash: 6b4d9d9696
+    name: poi-io-6b4d9d9696-cxmj4
+    namespace: poi-atividade5
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: poi-io-6b4d9d9696
+      uid: 001704ac-081b-4104-8267-e1f403907103
+    resourceVersion: "153552"
+    uid: c052a181-1b85-478a-9abe-c8b297b9e1fe
+  spec:
+    containers:
+    - env:
+      - name: IO_DIRETORIO_TEMP
+        value: /dados/io-temporarios
+      - name: IO_FSYNC
+        value: "1"
+      - name: IO_TAMANHO_MAX_MB
+        value: "32"
+      - name: IO_OPERACOES_MAX
+        value: "5"
+      - name: IO_MAX_SIMULTANEAS
+        value: "2"
+      image: arthuurvidaal/poi-io:atividade4
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: http
+          scheme: HTTP
+        initialDelaySeconds: 15
+        periodSeconds: 20
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: io
+      ports:
+      - containerPort: 8003
+        name: http
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: http
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 1260m
+          memory: 1000Mi
+        requests:
+          cpu: 126m
+          memory: 250Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dados/io-temporarios
+        name: dados-temporarios
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-h5gzd
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: minikube
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: dados-temporarios
+    - name: kube-api-access-h5gzd
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 126m
+      memory: 250Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T13:40:34Z"
+      observedGeneration: 8
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T12:40:48Z"
+      observedGeneration: 8
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T13:40:45Z"
+      observedGeneration: 8
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T13:40:45Z"
+      observedGeneration: 8
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T12:40:48Z"
+      observedGeneration: 8
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 126m
+        memory: 250Mi
+      containerID: containerd://0d77d3476181f9e4fe341bb02834e4e041767e7727ed7664badf6f426243f38a
+      image: docker.io/arthuurvidaal/poi-io:atividade4
+      imageID: docker.io/arthuurvidaal/poi-io@sha256:071c45e4e1812c9824245eccab5c63b9850b57009dc8bb74c0b0edbbf975e8c0
+      lastState:
+        terminated:
+          containerID: containerd://23a40c2bb016219d479b6d95fb89d3b74f02f80d3048ddf970fdd6757e00ec8f
+          exitCode: 255
+          finishedAt: "2026-11-26T13:40:25Z"
+          reason: Unknown
+          startedAt: "2026-11-26T12:40:59Z"
+      name: io
+      ready: true
+      resources:
+        limits:
+          cpu: 1260m
+          memory: 1000Mi
+        requests:
+          cpu: 126m
+          memory: 250Mi
+      restartCount: 1
+      started: true
+      state:
+        running:
+          startedAt: "2026-11-26T13:40:35Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /dados/io-temporarios
+        name: dados-temporarios
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-h5gzd
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.49.2
+    hostIPs:
+    - ip: 192.168.49.2
+    observedGeneration: 8
+    phase: Running
+    podIP: 10.244.0.3
+    podIPs:
+    - ip: 10.244.0.3
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 1260m
+        memory: 1000Mi
+      requests:
+        cpu: 104m
+        memory: 250Mi
+    startTime: "2026-11-26T12:40:48Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      vpaObservedContainers: io
+      vpaUpdates: 'Pod resources updated by poi-io-vpa: container 0: memory request,
+        cpu request, cpu limit, memory limit'
+    creationTimestamp: "2026-11-28T10:55:25Z"
+    generateName: poi-io-6b4d9d9696-
+    generation: 1
+    labels:
+      app: poi-io
+      pod-template-hash: 6b4d9d9696
+    name: poi-io-6b4d9d9696-gpw6q
+    namespace: poi-atividade5
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: poi-io-6b4d9d9696
+      uid: 001704ac-081b-4104-8267-e1f403907103
+    resourceVersion: "151987"
+    uid: d8c0bf14-7ee7-42ae-be17-e9007259cef4
+  spec:
+    containers:
+    - env:
+      - name: IO_DIRETORIO_TEMP
+        value: /dados/io-temporarios
+      - name: IO_FSYNC
+        value: "1"
+      - name: IO_TAMANHO_MAX_MB
+        value: "32"
+      - name: IO_OPERACOES_MAX
+        value: "5"
+      - name: IO_MAX_SIMULTANEAS
+        value: "2"
+      image: arthuurvidaal/poi-io:atividade4
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: http
+          scheme: HTTP
+        initialDelaySeconds: 15
+        periodSeconds: 20
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: io
+      ports:
+      - containerPort: 8003
+        name: http
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: http
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 1260m
+          memory: 1000Mi
+        requests:
+          cpu: 126m
+          memory: 250Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dados/io-temporarios
+        name: dados-temporarios
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-7p8cr
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: minikube
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: dados-temporarios
+    - name: kube-api-access-7p8cr
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 126m
+      memory: 250Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:55:26Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:55:26Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:55:37Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:55:37Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:55:26Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 126m
+        memory: 250Mi
+      containerID: containerd://8d4731778dc3b8cf8e5a5ca04b9d127570b80f4b804ccc96f6a78dd0f4705311
+      image: docker.io/arthuurvidaal/poi-io:atividade4
+      imageID: docker.io/arthuurvidaal/poi-io@sha256:071c45e4e1812c9824245eccab5c63b9850b57009dc8bb74c0b0edbbf975e8c0
+      lastState: {}
+      name: io
+      ready: true
+      resources:
+        limits:
+          cpu: 1260m
+          memory: 1000Mi
+        requests:
+          cpu: 126m
+          memory: 250Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-11-28T10:55:26Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /dados/io-temporarios
+        name: dados-temporarios
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-7p8cr
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.49.2
+    hostIPs:
+    - ip: 192.168.49.2
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.244.0.37
+    podIPs:
+    - ip: 10.244.0.37
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 1260m
+        memory: 1000Mi
+      requests:
+        cpu: 104m
+        memory: 250Mi
+    startTime: "2026-11-28T10:55:26Z"
+kind: List
+metadata:
+  resourceVersion: ""

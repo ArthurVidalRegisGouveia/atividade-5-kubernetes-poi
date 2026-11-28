@@ -1,0 +1,5 @@
+Iniciando carga CPU VPA Off
+Cliente 2: sucesso=197 falha=0
+Cliente 3: sucesso=204 falha=0
+Cliente 1: sucesso=201 falha=0
+Teste finalizado

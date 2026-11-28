@@ -1,0 +1,52 @@
+Name:         poi-cpu-vpa
+Namespace:    poi-atividade5
+Labels:       <none>
+Annotations:  <none>
+API Version:  autoscaling.k8s.io/v1
+Kind:         VerticalPodAutoscaler
+Metadata:
+  Creation Timestamp:  2026-11-28T10:04:45Z
+  Generation:          1
+  Resource Version:    148517
+  UID:                 7d172b97-10eb-479d-b243-7c4377e0d507
+Spec:
+  Resource Policy:
+    Container Policies:
+      Container Name:  cpu
+      Controlled Resources:
+        cpu
+        memory
+      Max Allowed:
+        Cpu:     1
+        Memory:  512Mi
+      Min Allowed:
+        Cpu:     100m
+        Memory:  64Mi
+  Target Ref:
+    API Version:  apps/v1
+    Kind:         Deployment
+    Name:         poi-cpu
+  Update Policy:
+    Update Mode:  Off
+Status:
+  Conditions:
+    Last Transition Time:  2026-11-28T10:05:06Z
+    Status:                True
+    Type:                  RecommendationProvided
+  Observed Generation:     1
+  Recommendation:
+    Container Recommendations:
+      Container Name:  cpu
+      Lower Bound:
+        Cpu:     100m
+        Memory:  250Mi
+      Target:
+        Cpu:     224m
+        Memory:  250Mi
+      Uncapped Target:
+        Cpu:     224m
+        Memory:  250Mi
+      Upper Bound:
+        Cpu:     1
+        Memory:  512Mi
+Events:          <none>

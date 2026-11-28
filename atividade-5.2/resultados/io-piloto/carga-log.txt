@@ -1,0 +1,5 @@
+Iniciando carga I/O-bound
+Cliente 2: sucesso=356 falha=90
+Cliente 3: sucesso=353 falha=136
+Cliente 1: sucesso=350 falha=92
+Teste finalizado

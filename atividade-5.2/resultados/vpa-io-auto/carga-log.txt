@@ -1,0 +1,5 @@
+Iniciando carga IO VPA Auto
+Cliente 1: sucesso=417 erro503=32 outras_falhas=0
+Cliente 2: sucesso=427 erro503=20 outras_falhas=0
+Cliente 3: sucesso=429 erro503=27 outras_falhas=0
+Teste finalizado

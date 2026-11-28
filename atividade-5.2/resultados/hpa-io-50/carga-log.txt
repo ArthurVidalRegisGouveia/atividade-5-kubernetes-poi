@@ -1,0 +1,5 @@
+Iniciando carga I/O HPA 50%
+Cliente 2: sucesso=384 http503=67 outros_http=0 erro_conexao=0
+Cliente 1: sucesso=377 http503=70 outros_http=0 erro_conexao=0
+Cliente 3: sucesso=382 http503=72 outros_http=0 erro_conexao=0
+Teste finalizado

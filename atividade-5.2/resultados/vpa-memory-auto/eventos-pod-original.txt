@@ -1,0 +1,68 @@
+Name:             poi-memory-5cb4d6759b-ld4gx
+Namespace:        poi-atividade5
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Thu, 26 Nov 2026 12:40:48 +0000
+Labels:           app=poi-memory
+                  pod-template-hash=5cb4d6759b
+Annotations:      vpaInPlaceUpdated: true
+Status:           Running
+IP:               10.244.0.2
+IPs:
+  IP:           10.244.0.2
+Controlled By:  ReplicaSet/poi-memory-5cb4d6759b
+Containers:
+  memory:
+    Container ID:   containerd://b42b153f93577d67e9fb05c25a719061b058e5eeadf152aba8466ff09f34339b
+    Image:          arthuurvidaal/poi-memory:atividade4
+    Image ID:       docker.io/arthuurvidaal/poi-memory@sha256:8181ce48e6bd3ead24e1bc545868dc1192e5ab8d39676bedbfa7d9c91b65561c
+    Port:           8002/TCP (http)
+    Host Port:      0/TCP (http)
+    State:          Running
+      Started:      Thu, 26 Nov 2026 13:40:35 +0000
+    Last State:     Terminated
+      Reason:       Unknown
+      Exit Code:    255
+      Started:      Thu, 26 Nov 2026 12:41:03 +0000
+      Finished:     Thu, 26 Nov 2026 13:40:25 +0000
+    Ready:          True
+    Restart Count:  1
+    Limits:
+      cpu:     780m
+      memory:  500Mi
+    Requests:
+      cpu:      78m
+      memory:   250Mi
+    Liveness:   http-get http://:http/health delay=15s timeout=1s period=20s successThreshold=1 failureThreshold=3
+    Readiness:  http-get http://:http/health delay=5s timeout=1s period=10s successThreshold=1 failureThreshold=3
+    Environment:
+      MEMORY_RETENCAO_SEGUNDOS:  1
+      MEMORY_LIMITE_MAX_MB:      64
+      MEMORY_MAX_SIMULTANEAS:    4
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-8wgr5 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       True
+  ContainersReady             True
+  PodScheduled                True
+Volumes:
+  kube-api-access-8wgr5:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason               Age   From         Message
+  ----    ------               ----  ----         -------
+  Normal  ResizeStarted        23s   kubelet      Pod resize started: {"containers":[{"name":"memory","resources":{"limits":{"cpu":"780m","memory":"500Mi"},"requests":{"cpu":"78m","memory":"250Mi"}}}],"generation":2}
+  Normal  InPlaceResizedByVPA  23s   vpa-updater  Pod was resized in place by VPA Updater.
+  Normal  ResizeCompleted      22s   kubelet      Pod resize completed: {"containers":[{"name":"memory","resources":{"limits":{"cpu":"780m","memory":"500Mi"},"requests":{"cpu":"78m","memory":"250Mi"}}}],"generation":2}

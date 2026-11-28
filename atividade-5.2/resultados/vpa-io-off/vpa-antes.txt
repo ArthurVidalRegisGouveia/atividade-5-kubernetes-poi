@@ -1,0 +1,31 @@
+Name:         poi-io-vpa
+Namespace:    poi-atividade5
+Labels:       <none>
+Annotations:  <none>
+API Version:  autoscaling.k8s.io/v1
+Kind:         VerticalPodAutoscaler
+Metadata:
+  Creation Timestamp:  2026-11-28T10:44:38Z
+  Generation:          1
+  Resource Version:    151263
+  UID:                 e957d040-4d45-4ac0-b9a4-62cb257e8dec
+Spec:
+  Resource Policy:
+    Container Policies:
+      Container Name:  io
+      Controlled Resources:
+        cpu
+        memory
+      Max Allowed:
+        Cpu:     1
+        Memory:  512Mi
+      Min Allowed:
+        Cpu:     50m
+        Memory:  64Mi
+  Target Ref:
+    API Version:  apps/v1
+    Kind:         Deployment
+    Name:         poi-io
+  Update Policy:
+    Update Mode:  Off
+Events:           <none>

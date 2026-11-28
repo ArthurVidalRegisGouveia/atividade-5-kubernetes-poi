@@ -1,0 +1,4 @@
+Iniciando carga Memory-bound
+Cliente 1: sucesso=108 falha=0
+Cliente 2: sucesso=108 falha=0
+Teste finalizado

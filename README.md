@@ -51,3 +51,23 @@ Em 26/11/2026, os três Pods estavam `Running`, os Deployments concluíram o rol
 - [Configurações reais dos serviços systemd](systemd/README.md) — quatro unidades transcritas da saída de `sudo systemctl cat` executada na VM.
 - [Evidências visuais](evidencias/) — oito capturas validadas, incluindo cluster, Deployments, rollouts, serviços e testes pelo Octavia.
 
+
+## Atividade 5.2 — Autoscaling com HPA e VPA
+
+Em 28/11/2026 foram executados 12 cenarios experimentais:
+seis com HPA e seis com VPA, envolvendo as aplicacoes CPU-bound,
+Memory-bound e IO-bound.
+
+- HPA: politicas de utilizacao-alvo de 50% e 75%.
+- VPA: modos `Off` e `InPlaceOrRecreate`.
+- Duracao nominal de cada teste: 120 segundos.
+- Resultados: metricas, logs, eventos e nove graficos PNG.
+
+**Relatorio completo:**
+[Atividade 5.2 — Autoscaling HPA e VPA](documentacao/Atividade-5.2-Autoscaling-HPA-VPA.md).
+
+**Artefatos:** [atividade-5.2/](atividade-5.2/).
+
+O desempenho observado deve ser interpretado considerando as
+limitacoes metodologicas descritas no relatorio, especialmente
+a diferenca no numero de replicas entre os testes VPA.

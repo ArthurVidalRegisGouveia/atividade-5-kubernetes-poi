@@ -1,0 +1,385 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      vpaInPlaceUpdated: "true"
+    creationTimestamp: "2026-11-26T12:40:47Z"
+    generateName: poi-cpu-66db8645d-
+    generation: 4
+    labels:
+      app: poi-cpu
+      pod-template-hash: 66db8645d
+    name: poi-cpu-66db8645d-plkbm
+    namespace: poi-atividade5
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: poi-cpu-66db8645d
+      uid: 6919ac35-dfaa-490f-8957-29597e06410c
+    resourceVersion: "149648"
+    uid: 78bcd02a-f206-4912-a966-a6f4c7eb2c60
+  spec:
+    containers:
+    - env:
+      - name: CPU_LIMITE_MAX
+        value: "1000000"
+      image: arthuurvidaal/poi-cpu:atividade4
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: http
+          scheme: HTTP
+        initialDelaySeconds: 15
+        periodSeconds: 20
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: cpu
+      ports:
+      - containerPort: 8001
+        name: http
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: http
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 758m
+          memory: 500Mi
+        requests:
+          cpu: 379m
+          memory: 250Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-qscbw
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: minikube
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-qscbw
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 379m
+      memory: 250Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T13:40:34Z"
+      observedGeneration: 4
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T12:40:47Z"
+      observedGeneration: 4
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T13:40:48Z"
+      observedGeneration: 4
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T13:40:48Z"
+      observedGeneration: 4
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-26T12:40:47Z"
+      observedGeneration: 4
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 379m
+        memory: 250Mi
+      containerID: containerd://c6fe40d8d77cb839fdcf61a45f294431357e8d1c4a2f6ae37642548f2cad9e5e
+      image: docker.io/arthuurvidaal/poi-cpu:atividade4
+      imageID: docker.io/arthuurvidaal/poi-cpu@sha256:97120243280ce46f2bb251fe6f0bc00c0e4c68818db09ce9b6d5c34aa635b7d5
+      lastState:
+        terminated:
+          containerID: containerd://1197186b0318a2fb07b10b27f4b83e483c591f967b0a24fd6da171a293c3e069
+          exitCode: 255
+          finishedAt: "2026-11-26T13:40:25Z"
+          reason: Unknown
+          startedAt: "2026-11-26T12:41:06Z"
+      name: cpu
+      ready: true
+      resources:
+        limits:
+          cpu: 758m
+          memory: 500Mi
+        requests:
+          cpu: 379m
+          memory: 250Mi
+      restartCount: 1
+      started: true
+      state:
+        running:
+          startedAt: "2026-11-26T13:40:35Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-qscbw
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.49.2
+    hostIPs:
+    - ip: 192.168.49.2
+    observedGeneration: 4
+    phase: Running
+    podIP: 10.244.0.4
+    podIPs:
+    - ip: 10.244.0.4
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 760m
+        memory: 500Mi
+      requests:
+        cpu: 361m
+        memory: 250Mi
+    startTime: "2026-11-26T12:40:47Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      vpaObservedContainers: cpu
+      vpaUpdates: 'Pod resources updated by poi-cpu-vpa: container 0: cpu request,
+        memory request, cpu limit, memory limit'
+    creationTimestamp: "2026-11-28T10:14:33Z"
+    generateName: poi-cpu-66db8645d-
+    generation: 1
+    labels:
+      app: poi-cpu
+      pod-template-hash: 66db8645d
+    name: poi-cpu-66db8645d-qvg7g
+    namespace: poi-atividade5
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: poi-cpu-66db8645d
+      uid: 6919ac35-dfaa-490f-8957-29597e06410c
+    resourceVersion: "149158"
+    uid: 950c164e-d0d9-4cb1-8e19-f558f5667697
+  spec:
+    containers:
+    - env:
+      - name: CPU_LIMITE_MAX
+        value: "1000000"
+      image: arthuurvidaal/poi-cpu:atividade4
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: http
+          scheme: HTTP
+        initialDelaySeconds: 15
+        periodSeconds: 20
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: cpu
+      ports:
+      - containerPort: 8001
+        name: http
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: http
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 758m
+          memory: 500Mi
+        requests:
+          cpu: 379m
+          memory: 250Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-pbqmk
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: minikube
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-pbqmk
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 379m
+      memory: 250Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:14:33Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:14:33Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:14:44Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:14:44Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-11-28T10:14:33Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 379m
+        memory: 250Mi
+      containerID: containerd://ee977f11074a5ca8ef3d3e21ed23fcf702212f35ad0e33a81c7fd7e45c55f1a5
+      image: docker.io/arthuurvidaal/poi-cpu:atividade4
+      imageID: docker.io/arthuurvidaal/poi-cpu@sha256:97120243280ce46f2bb251fe6f0bc00c0e4c68818db09ce9b6d5c34aa635b7d5
+      lastState: {}
+      name: cpu
+      ready: true
+      resources:
+        limits:
+          cpu: 758m
+          memory: 500Mi
+        requests:
+          cpu: 379m
+          memory: 250Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-11-28T10:14:34Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-pbqmk
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.49.2
+    hostIPs:
+    - ip: 192.168.49.2
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.244.0.29
+    podIPs:
+    - ip: 10.244.0.29
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 760m
+        memory: 500Mi
+      requests:
+        cpu: 361m
+        memory: 250Mi
+    startTime: "2026-11-28T10:14:33Z"
+kind: List
+metadata:
+  resourceVersion: ""
